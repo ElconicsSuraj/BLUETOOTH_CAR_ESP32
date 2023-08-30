@@ -1,0 +1,129 @@
+// Load libraries
+#include "BluetoothSerial.h"
+
+
+
+// Check if Bluetooth configs are enabled
+#if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
+#error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
+#endif
+
+// Bluetooth Serial object
+BluetoothSerial SerialBT;
+
+// GPIO where LED is connected to
+const int ledpin =  2;
+const int rfmotor = 4;
+const int rbmotor = 16;
+const int lfmotor = 17;
+const int lbmotor = 5;
+
+void receive_sig ()
+{
+  digitalWrite(ledpin, HIGH);
+  delay(100);
+  digitalWrite(ledpin, LOW);
+  delay(100);
+}
+
+void forward()
+{
+  digitalWrite(rfmotor, HIGH);
+  digitalWrite(lfmotor, HIGH);
+  digitalWrite(rbmotor, LOW);
+  digitalWrite(lbmotor, LOW);
+  Serial.println("Forward");
+}
+
+
+void backward()
+{
+  digitalWrite(rfmotor, LOW);
+  digitalWrite(lfmotor, LOW);
+  digitalWrite(rbmotor, HIGH);
+  digitalWrite(lbmotor, HIGH);
+  Serial.println("Backward");
+}
+
+
+void right()
+{
+  digitalWrite(rfmotor, HIGH);
+  digitalWrite(lfmotor, LOW);
+  digitalWrite(rbmotor, LOW);
+  digitalWrite(lbmotor, HIGH);
+  Serial.println("Right");
+}
+
+
+void left()
+{
+  digitalWrite(rfmotor, LOW);
+  digitalWrite(lfmotor, HIGH);
+  digitalWrite(rbmotor, HIGH);
+  digitalWrite(lbmotor, LOW);
+  Serial.println("Left");
+}
+
+
+void stopp()
+{
+  digitalWrite(rfmotor, LOW);
+  digitalWrite(lfmotor, LOW);
+  digitalWrite(rbmotor, LOW);
+  digitalWrite(lbmotor, LOW);
+  Serial.println("Stop");
+}
+
+
+void setup() {
+  pinMode(ledpin, OUTPUT);
+  pinMode(rfmotor, OUTPUT);
+  pinMode(rbmotor, OUTPUT);
+  pinMode(lfmotor, OUTPUT);
+  pinMode(lbmotor, OUTPUT);
+
+  Serial.begin(115200);
+  // Bluetooth device name
+  SerialBT.begin("CAR ESP32");
+  Serial.println("The device started, now you can pair it with bluetooth!");
+}
+
+void loop() {
+
+  char message = SerialBT.read();
+  switch (message)
+  {
+    case 'F' :
+      forward();
+      receive_sig ();
+      break ;
+
+    case 'B' :
+      backward();
+      receive_sig ();
+      break ;
+
+
+    case 'R' :
+      right();
+      receive_sig ();
+      break ;
+
+    case 'L' :
+      left();
+      receive_sig ();
+      break ;
+
+    case 'S' :
+      stopp();
+      receive_sig ();
+      break ;
+
+
+
+
+
+  }
+}
+
